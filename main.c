@@ -85,7 +85,13 @@ static inline void check(Term expr[EXPR_LEN], unsigned len, float goal) {
 	float ans = *stack;
 	if (ABS(ans / goal - 1) < 0.00001) {
 		for (unsigned i = 0; i < len; ++i) {
-			printf("%u %f, ", expr[i].tag, expr[i].value);
+			if (expr[i].tag == NUMERIC) {
+				printf("%.4f, ", expr[i].value);
+			} else {
+				char *tags[] = {"?", "/",   "*",	"+",	"-",
+						    "^", "sin", "sqrt", "log"};
+				printf("%s, ", tags[expr[i].tag]);
+			}
 		}
 		printf("= %f (%f, %f%%)\n", ans, ans - goal, ans / goal * 100);
 	}
