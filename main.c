@@ -88,8 +88,8 @@ static inline void check(Term expr[EXPR_LEN], unsigned len, float goal) {
 			if (expr[i].tag == NUMERIC) {
 				printf("%.4f, ", expr[i].value);
 			} else {
-				char *tags[] = {"?", "/",   "*",	"+",	"-",
-						    "^", "sin", "sqrt", "log"};
+				char *tags[] = {"?", "/",   "*",	"+", "-",
+						    "^", "sin", "sqrt", "ln"};
 				printf("%s, ", tags[expr[i].tag]);
 			}
 		}
