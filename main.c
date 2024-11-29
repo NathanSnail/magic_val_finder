@@ -97,6 +97,8 @@ int main(int argv, char **argc) {
 	    {.tag = NUMERIC, .value = 2},
 	    {.tag = NUMERIC, .value = 3},
 	    {.tag = NUMERIC, .value = 4},
+	    {.tag = NUMERIC, .value = 3.14159265358979323846264338327950},
+	    {.tag = NUMERIC, .value = 2.71828182845904523536028747135266},
 	    {.tag = DIV},
 	    {.tag = MUL},
 	    {.tag = ADD},
