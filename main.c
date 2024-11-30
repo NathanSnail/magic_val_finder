@@ -5,6 +5,8 @@
 #define EXPR_LEN 10
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 #define LEN(x) (sizeof(x) / sizeof(x[0]))
+// #define SANITY_CHECKS
+#define PRECOMPUTE_PROD
 
 typedef enum {
 	NUMERIC,
@@ -34,49 +36,65 @@ static inline void check(Term expr[EXPR_LEN], unsigned len, float goal) {
 			++stack_ptr;
 			break;
 		case DIV:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 1)
 				return;
+#endif
 			stack[stack_ptr - 1] /= stack[stack_ptr];
 			--stack_ptr;
 			break;
 		case MUL:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 1)
 				return;
+#endif
 			stack[stack_ptr - 1] *= stack[stack_ptr];
 			--stack_ptr;
 			break;
 		case ADD:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 1)
 				return;
+#endif
 			stack[stack_ptr - 1] += stack[stack_ptr];
 			--stack_ptr;
 			break;
 		case SUB:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 1)
 				return;
+#endif
 			stack[stack_ptr - 1] -= stack[stack_ptr];
 			--stack_ptr;
 			break;
 		case POW:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 1)
 				return;
+#endif
 			stack[stack_ptr - 1] =
 			    powf(stack[stack_ptr - 1], stack[stack_ptr]);
 			--stack_ptr;
 			break;
 		case SIN:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 0)
 				return;
+#endif
 			stack[stack_ptr] = sinf(stack[stack_ptr]);
 			break;
 		case SQRT:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 0)
 				return;
+#endif
 			stack[stack_ptr] = sqrtf(stack[stack_ptr]);
 			break;
 		case LOG:
+#ifdef SANITY_CHECKS
 			if (stack_ptr < 0)
 				return;
+#endif
 			stack[stack_ptr] = logf(stack[stack_ptr]);
 			break;
 		}
@@ -121,8 +139,22 @@ int main(int argv, char **argc) {
 	Term expr[EXPR_LEN];
 	float goal = atof(argc[1]);
 
-	// replacing prods with its value seems to make the code a bit slower, not
-	// sure why
+#ifdef PRECOMPUTE_PROD
+	// clang-format off
+	const unsigned long long prods[EXPR_LEN] = {
+		1,
+		LEN(opts),
+		LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+	};
+	// clang-format on
+#else
 	unsigned long long prods[EXPR_LEN] = {};
 	for (int i = 0; i < EXPR_LEN; ++i) {
 		prods[i] = 1;
@@ -130,6 +162,7 @@ int main(int argv, char **argc) {
 			prods[i] *= LEN(opts);
 		}
 	}
+#endif
 #pragma unroll
 	for (unsigned len = 1; len < EXPR_LEN; ++len) {
 		printf("%d\n", len);
