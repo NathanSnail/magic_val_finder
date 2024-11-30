@@ -126,9 +126,11 @@ int main(int argv, char **argc) {
 			prods[i] *= LEN(opts);
 		}
 	}
+#pragma unroll
 	for (unsigned len = 1; len < EXPR_LEN; ++len) {
 		printf("%d\n", len);
 		for (unsigned long long i = 0; i < prods[len]; ++i) {
+#pragma unroll
 			for (unsigned j = 0; j < len; ++j) {
 				expr[j] = opts[(i % prods[j + 1]) / prods[j]];
 			}
