@@ -121,6 +121,8 @@ int main(int argv, char **argc) {
 	Term expr[EXPR_LEN];
 	float goal = atof(argc[1]);
 
+	// replacing prods with its value seems to make the code a bit slower, not
+	// sure why
 	unsigned long long prods[EXPR_LEN] = {};
 	for (int i = 0; i < EXPR_LEN; ++i) {
 		prods[i] = 1;
