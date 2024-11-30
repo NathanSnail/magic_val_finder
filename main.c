@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,8 +115,9 @@ int main(int argv, char **argc) {
 	    {.tag = SQRT},
 	    {.tag = LOG},
 	};
-	Term t[] = {opts[3], opts[1], opts[6], opts[3],
-			opts[0], opts[6], opts[4]};
+	char shift[] = {1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, 0, 0, 0};
+	assert(LEN(opts) == LEN(shift));
+
 	Term expr[EXPR_LEN];
 	float goal = atof(argc[1]);
 
@@ -130,11 +132,19 @@ int main(int argv, char **argc) {
 	for (unsigned len = 1; len < EXPR_LEN; ++len) {
 		printf("%d\n", len);
 		for (unsigned long long i = 0; i < prods[len]; ++i) {
+			char depth = 0;
 #pragma unroll
 			for (unsigned j = 0; j < len; ++j) {
-				expr[j] = opts[(i % prods[j + 1]) / prods[j]];
+				int index = (i % prods[j + 1]) / prods[j];
+				depth += shift[index];
+				if (depth < 0)
+					goto skip;
+				expr[j] = opts[index];
 			}
+			if (depth != 1)
+				goto skip;
 			check(expr, len, goal);
+		skip:
 		}
 	}
 }
