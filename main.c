@@ -106,16 +106,16 @@ int main(int argv, char **argc) {
 	    {.tag = NUMERIC, .value = 4},
 	    {.tag = NUMERIC, .value = 3.14159265358979323846264338327950},
 	    {.tag = NUMERIC, .value = 2.71828182845904523536028747135266},
+	    {.tag = SIN},
+	    {.tag = SQRT},
+	    {.tag = LOG},
 	    {.tag = DIV},
 	    {.tag = MUL},
 	    {.tag = ADD},
 	    {.tag = SUB},
 	    {.tag = POW},
-	    {.tag = SIN},
-	    {.tag = SQRT},
-	    {.tag = LOG},
 	};
-	char shift[] = {1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, 0, 0, 0};
+	char shift[] = {1, 1, 1, 1, 1, 1, 0, 0, 0, -1, -1, -1, -1, -1};
 	assert(LEN(opts) == LEN(shift));
 
 	Term expr[EXPR_LEN];
@@ -133,6 +133,10 @@ int main(int argv, char **argc) {
 		printf("%d\n", len);
 		for (unsigned long long i = 0; i < prods[len]; ++i) {
 			char depth = 0;
+			if (i % LEN(opts) >= 6)
+				continue;
+			if ((i % (LEN(opts) * LEN(opts))) / LEN(opts) >= 9)
+				continue;
 #pragma unroll
 			for (unsigned j = 0; j < len; ++j) {
 				int index = (i % prods[j + 1]) / prods[j];
@@ -142,7 +146,7 @@ int main(int argv, char **argc) {
 				expr[j] = opts[index];
 			}
 			if (depth != 1)
-				goto skip;
+				continue;
 			check(expr, len, goal);
 		skip:
 		}
