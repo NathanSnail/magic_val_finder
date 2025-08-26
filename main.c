@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define EXPR_LEN 10
+#define EXPR_LEN 20
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 #define LEN(x) (sizeof(x) / sizeof(x[0]))
 // #define SANITY_CHECKS
@@ -107,8 +107,10 @@ static inline void check(Term expr[EXPR_LEN], unsigned len, float goal) {
 			if (expr[i].tag == NUMERIC) {
 				printf("%.4f, ", expr[i].value);
 			} else {
-				char *tags[] = {"?", "/",   "*",	"+", "-",
-						    "^", "sin", "sqrt", "ln"};
+				char *tags[] = {
+				    [NUMERIC] = "?", [DIV] = "/",	  [MUL] = "*",
+				    [ADD] = "+",	   [SUB] = "-",	  [POW] = "^",
+				    [SIN] = "sin",   [SQRT] = "sqrt", [LOG] = "ln"};
 				printf("%s, ", tags[expr[i].tag]);
 			}
 		}
@@ -118,22 +120,30 @@ static inline void check(Term expr[EXPR_LEN], unsigned len, float goal) {
 
 int main(int argv, char **argc) {
 	Term opts[] = {
-	    {.tag = NUMERIC, .value = 1},
-	    {.tag = NUMERIC, .value = 2},
-	    {.tag = NUMERIC, .value = 3},
-	    {.tag = NUMERIC, .value = 4},
+	    //{.tag = NUMERIC, .value = 1},
+	    //{.tag = NUMERIC, .value = 2},
+	    //{.tag = NUMERIC, .value = 3},
+	    //{.tag = NUMERIC, .value = 4},
 	    {.tag = NUMERIC, .value = 3.14159265358979323846264338327950},
 	    {.tag = NUMERIC, .value = 2.71828182845904523536028747135266},
+	    // 2 nums
 	    {.tag = SIN},
 	    {.tag = SQRT},
 	    {.tag = LOG},
+	    // 5 binary opts or nums
 	    {.tag = DIV},
 	    {.tag = MUL},
 	    {.tag = ADD},
 	    {.tag = SUB},
 	    {.tag = POW},
 	};
-	char shift[] = {1, 1, 1, 1, 1, 1, 0, 0, 0, -1, -1, -1, -1, -1};
+	char shift[] = {
+
+	    // 1,
+	    // 1,
+	    // 1,
+	    // 1,
+	    1, 1, 0, 0, 0, -1, -1, -1, -1, -1};
 	assert(LEN(opts) == LEN(shift));
 
 	Term expr[EXPR_LEN];
@@ -152,6 +162,16 @@ int main(int argv, char **argc) {
 		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
 		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
 		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
+		LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts) * LEN(opts),
 	};
 	// clang-format on
 #else
@@ -168,10 +188,14 @@ int main(int argv, char **argc) {
 		printf("%d\n", len);
 		for (unsigned long long i = 0; i < prods[len]; ++i) {
 			char depth = 0;
-			if (i % LEN(opts) >= 6)
+			// if we choose something too late for the last opt then we
+			// will be invalid, as thats an operator
+			/*if (i % LEN(opts) >= 2)
 				continue;
-			if ((i % (LEN(opts) * LEN(opts))) / LEN(opts) >= 9)
+			// similar to above, cant do a binary op second
+			if ((i % (LEN(opts) * LEN(opts))) / LEN(opts) >= 5)
 				continue;
+			*/
 #pragma unroll
 			for (unsigned j = 0; j < len; ++j) {
 				int index = (i % prods[j + 1]) / prods[j];
