@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #define EXPR_LEN 20
@@ -102,7 +103,8 @@ static inline void check(Term expr[EXPR_LEN], unsigned len, float goal) {
 	if (stack_ptr != 0)
 		return;
 	float ans = *stack;
-	if (ABS(ans / goal - 1) < 0.00001) {
+	if (ABS(ans - goal) < 0.5) {
+		// if (ABS(ans / goal - 1) < 0.00001) {
 		for (unsigned i = 0; i < len; ++i) {
 			if (expr[i].tag == NUMERIC) {
 				printf("%.4f, ", expr[i].value);
@@ -119,18 +121,23 @@ static inline void check(Term expr[EXPR_LEN], unsigned len, float goal) {
 }
 
 int main(int argv, char **argc) {
-	Term opts[] = {
+	const uint8_t num_nums = 1;
+	const uint8_t num_unary = 3;
+	const Term opts[] = {
+	    // numeric
 	    //{.tag = NUMERIC, .value = 1},
-	    //{.tag = NUMERIC, .value = 2},
+	    {.tag = NUMERIC, .value = 2},
 	    //{.tag = NUMERIC, .value = 3},
 	    //{.tag = NUMERIC, .value = 4},
-	    {.tag = NUMERIC, .value = 3.14159265358979323846264338327950},
-	    {.tag = NUMERIC, .value = 2.71828182845904523536028747135266},
-	    // 2 nums
+	    //{.tag = NUMERIC, .value = 3.14159265358979323846264338327950},
+	    //{.tag = NUMERIC, .value = 2.71828182845904523536028747135266},
+
+	    // unary
 	    {.tag = SIN},
 	    {.tag = SQRT},
 	    {.tag = LOG},
-	    // 5 binary opts or nums
+
+	    // binary
 	    {.tag = DIV},
 	    {.tag = MUL},
 	    {.tag = ADD},
@@ -143,7 +150,8 @@ int main(int argv, char **argc) {
 	    // 1,
 	    // 1,
 	    // 1,
-	    1, 1, 0, 0, 0, -1, -1, -1, -1, -1};
+	    // 1,
+	    1, 0, 0, 0, -1, -1, -1, -1, -1};
 	assert(LEN(opts) == LEN(shift));
 
 	Term expr[EXPR_LEN];
@@ -151,7 +159,7 @@ int main(int argv, char **argc) {
 
 #ifdef PRECOMPUTE_PROD
 	// clang-format off
-	const unsigned long long prods[EXPR_LEN] = {
+	const uint64_t prods[EXPR_LEN] = {
 		1,
 		LEN(opts),
 		LEN(opts) * LEN(opts),
@@ -184,21 +192,21 @@ int main(int argv, char **argc) {
 	}
 #endif
 #pragma unroll
-	for (unsigned len = 1; len < EXPR_LEN; ++len) {
+	for (uint32_t len = 1; len < EXPR_LEN; ++len) {
 		printf("%d\n", len);
-		for (unsigned long long i = 0; i < prods[len]; ++i) {
+		for (uint64_t i = 0; i < prods[len]; ++i) {
 			char depth = 0;
 			// if we choose something too late for the last opt then we
 			// will be invalid, as thats an operator
-			/*if (i % LEN(opts) >= 2)
+			if (i % LEN(opts) >= num_nums)
 				continue;
 			// similar to above, cant do a binary op second
-			if ((i % (LEN(opts) * LEN(opts))) / LEN(opts) >= 5)
+			if ((i % (LEN(opts) * LEN(opts))) / LEN(opts) >=
+			    num_unary + num_nums)
 				continue;
-			*/
 #pragma unroll
-			for (unsigned j = 0; j < len; ++j) {
-				int index = (i % prods[j + 1]) / prods[j];
+			for (uint32_t j = 0; j < len; ++j) {
+				uint32_t index = (i % prods[j + 1]) / prods[j];
 				depth += shift[index];
 				if (depth < 0)
 					goto skip;
