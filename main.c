@@ -125,10 +125,10 @@ int main(int argv, char **argc) {
 	const uint8_t num_unary = 3;
 	const Term opts[] = {
 	    // numeric
-	    //{.tag = NUMERIC, .value = 1},
+	    {.tag = NUMERIC, .value = 1},
 	    {.tag = NUMERIC, .value = 2},
-	    //{.tag = NUMERIC, .value = 3},
-	    //{.tag = NUMERIC, .value = 4},
+	    {.tag = NUMERIC, .value = 3},
+	    {.tag = NUMERIC, .value = 4},
 	    //{.tag = NUMERIC, .value = 3.14159265358979323846264338327950},
 	    //{.tag = NUMERIC, .value = 2.71828182845904523536028747135266},
 
@@ -148,10 +148,7 @@ int main(int argv, char **argc) {
 
 	    // 1,
 	    // 1,
-	    // 1,
-	    // 1,
-	    // 1,
-	    1, 0, 0, 0, -1, -1, -1, -1, -1};
+	    1, 1, 1, 1, 0, 0, 0, -1, -1, -1, -1, -1};
 	assert(LEN(opts) == LEN(shift));
 
 	Term expr[EXPR_LEN];
